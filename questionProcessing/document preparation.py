@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
+import pymysql
 from questionProcessing.question_read import read_ques
 from questionProcessing.ans_read import one_line,two_line,four_line,one_line2,two_line2,four_line2
-# from questionProcessing.write_db import write_que_bank
+from questionProcessing.write_db import write_que_bank
 
-questions = open("./QUESTION_BANK.txt","r")
-qid = 1
+questions = open("./test.txt","r")
+qid = 0
 adots = ("A.","A、","A:","A．","A：")
 status = 0
 s_dot = 0
+que_dict = {qid:["ImQue","ImAns"]}
+cho_dict = {qid:["ImChoA","ImChoB","ImChoC","ImChoD"]}
+
+db = pymysql.connect("127.0.0.1", "root", "admin", "question")
+cursor = db.cursor()
 
 for line in questions:
     # print(status)
@@ -15,17 +21,14 @@ for line in questions:
         continue
     question = line.lstrip()
     if question.startswith("1."):
-        read_ques(question,qid)
-        # write_que_bank(qid)
         qid += 1
+        read_ques(question,qid,que_dict)
+        # write_que_bank(qid,cursor)
+        print(qid)
         status = 0
         s_dot = 0
         continue
-        # seq = question.lsplit(pre.group())
-        # seqq = seq.split()
-        # qbsql = """INSERT INTO SJD_QUESTION_BANK (ID) VALUES(%s)"""
-        # mcsql = """INSERT INTO SJD_MULTI_CHOICE (QID,QUESTION,ANSWER)
-        #             VALUES (%s,)"""
+
     if status == 4 or s_dot == 4:
         continue
     if question.startswith(adots, status):
